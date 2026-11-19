@@ -36,9 +36,9 @@ flowchart TD
 ## AI subsystem (production, not demos)
 
 - **Structured extraction** : receipts, invoices and menus parsed into typed, validated records (structured outputs / tool use).
-- **Cost and latency control** : prompt caching and batching where the workload allows.
+- **Cost control** : every AI call goes through one guard. It reserves the estimated cost in a usage ledger before calling the provider, then settles the real cost from the usage the provider reports. Spend is capped per tenant (rolling 24 hours and 30 days) and across all tenants by a global circuit breaker (rolling 24 hours) that doubles as a kill switch. Inputs and outputs are bounded on every route, with two model tiers chosen per task.
 - **Safety** : input validation and prompt-injection defense on user-facing AI endpoints (kept high-level by design).
-- **Provider strategy** : Anthropic Claude primary, with graceful degradation.
+- **Provider strategy** : Anthropic Claude primary. When the provider refuses a call (credit, key, overload), the app says so in the user's language and the features that do not need the AI keep working.
 
 ## Built by an agent fleet
 
